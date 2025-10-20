@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
 using System.Threading.Tasks;
@@ -15,6 +16,8 @@ public partial class MainWindowViewModel : ViewModelBase
     private readonly AIService _aiService;
     private readonly ExportService _exportService;
     private readonly ThemeService _themeService;
+    private readonly FormattingService _formattingService;
+    private readonly KeyboardShortcutsService _shortcutsService;
 
     [ObservableProperty]
     private ObservableCollection<Note> _notes = new();
@@ -52,6 +55,8 @@ public partial class MainWindowViewModel : ViewModelBase
         _aiService = new AIService();
         _exportService = new ExportService();
         _themeService = new ThemeService();
+        _formattingService = new FormattingService();
+        _shortcutsService = new KeyboardShortcutsService();
         
         _ = InitializeAsync();
     }
@@ -392,5 +397,89 @@ public partial class MainWindowViewModel : ViewModelBase
         {
             StatusMessage = $"Erreur: {ex.Message}";
         }
+    }
+
+    [RelayCommand]
+    private void ApplyBoldFormatting()
+    {
+        if (!string.IsNullOrWhiteSpace(EditorContent))
+        {
+            // Apply bold to the last word or selected text (simplified)
+            var lines = EditorContent.Split('\n');
+            if (lines.Length > 0)
+            {
+                var lastLine = lines[^1];
+                var words = lastLine.Split(' ');
+                if (words.Length > 0)
+                {
+                    words[^1] = _formattingService.ApplyBold(words[^1]);
+                    lines[^1] = string.Join(' ', words);
+                    EditorContent = string.Join('\n', lines);
+                }
+            }
+        }
+    }
+
+    [RelayCommand]
+    private void ApplyItalicFormatting()
+    {
+        if (!string.IsNullOrWhiteSpace(EditorContent))
+        {
+            var lines = EditorContent.Split('\n');
+            if (lines.Length > 0)
+            {
+                var lastLine = lines[^1];
+                var words = lastLine.Split(' ');
+                if (words.Length > 0)
+                {
+                    words[^1] = _formattingService.ApplyItalic(words[^1]);
+                    lines[^1] = string.Join(' ', words);
+                    EditorContent = string.Join('\n', lines);
+                }
+            }
+        }
+    }
+
+    [RelayCommand]
+    private void InsertHeading(string level)
+    {
+        if (int.TryParse(level, out var headingLevel))
+        {
+            var heading = _formattingService.ApplyHeading("Titre", headingLevel);
+            EditorContent += $"\n{heading}\n";
+        }
+    }
+
+    [RelayCommand]
+    private void InsertBulletList()
+    {
+        var list = _formattingService.CreateBulletList(new List<string> { "Item 1", "Item 2", "Item 3" });
+        EditorContent += $"\n{list}\n";
+    }
+
+    [RelayCommand]
+    private void InsertTable()
+    {
+        var headers = new List<string> { "Colonne 1", "Colonne 2", "Colonne 3" };
+        var rows = new List<List<string>>
+        {
+            new() { "Donnée 1", "Donnée 2", "Donnée 3" },
+            new() { "Donnée 4", "Donnée 5", "Donnée 6" }
+        };
+        var table = _formattingService.CreateTable(headers, rows);
+        EditorContent += $"\n{table}\n";
+    }
+
+    [RelayCommand]
+    private void InsertHorizontalRule()
+    {
+        EditorContent += _formattingService.InsertHorizontalRule();
+    }
+
+    [RelayCommand]
+    private void InsertCodeBlock()
+    {
+        var code = _formattingService.CreateCodeBlock("// Votre code ici", "csharp");
+        EditorContent += $"\n{code}\n";
     }
 }
