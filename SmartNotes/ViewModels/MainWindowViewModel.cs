@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
 using System.Threading.Tasks;
@@ -13,6 +14,10 @@ public partial class MainWindowViewModel : ViewModelBase
 {
     private readonly NotesService _notesService;
     private readonly AIService _aiService;
+    private readonly ExportService _exportService;
+    private readonly ThemeService _themeService;
+    private readonly FormattingService _formattingService;
+    private readonly KeyboardShortcutsService _shortcutsService;
 
     [ObservableProperty]
     private ObservableCollection<Note> _notes = new();
@@ -41,16 +46,25 @@ public partial class MainWindowViewModel : ViewModelBase
     [ObservableProperty]
     private string _statusMessage = "Prêt";
 
+    [ObservableProperty]
+    private string _currentTheme = "Clair";
+
     public MainWindowViewModel()
     {
         _notesService = new NotesService();
         _aiService = new AIService();
+        _exportService = new ExportService();
+        _themeService = new ThemeService();
+        _formattingService = new FormattingService();
+        _shortcutsService = new KeyboardShortcutsService();
         
         _ = InitializeAsync();
     }
 
     private async Task InitializeAsync()
     {
+        await _themeService.InitializeThemeAsync();
+        UpdateThemeDisplay();
         await LoadNotesAsync();
         await LoadCategoriesAsync();
     }
@@ -254,5 +268,220 @@ public partial class MainWindowViewModel : ViewModelBase
                 await SaveCurrentNoteAsync();
             });
         }
+    }
+
+    [RelayCommand]
+    private async Task ExportNotePdfAsync()
+    {
+        if (SelectedNote == null)
+            return;
+
+        try
+        {
+            StatusMessage = "Export PDF en cours...";
+            var filePath = _exportService.GetSuggestedFilePath(SelectedNote, "pdf");
+            await _exportService.ExportToPdfAsync(SelectedNote, filePath);
+            StatusMessage = $"PDF exporté: {filePath}";
+        }
+        catch (Exception ex)
+        {
+            StatusMessage = $"Erreur export PDF: {ex.Message}";
+        }
+    }
+
+    [RelayCommand]
+    private async Task ExportNoteMarkdownAsync()
+    {
+        if (SelectedNote == null)
+            return;
+
+        try
+        {
+            StatusMessage = "Export Markdown en cours...";
+            var filePath = _exportService.GetSuggestedFilePath(SelectedNote, "md");
+            await _exportService.ExportToMarkdownAsync(SelectedNote, filePath);
+            StatusMessage = $"Markdown exporté: {filePath}";
+        }
+        catch (Exception ex)
+        {
+            StatusMessage = $"Erreur export Markdown: {ex.Message}";
+        }
+    }
+
+    [RelayCommand]
+    private async Task ExportNoteWordAsync()
+    {
+        if (SelectedNote == null)
+            return;
+
+        try
+        {
+            StatusMessage = "Export Word en cours...";
+            var filePath = _exportService.GetSuggestedFilePath(SelectedNote, "docx");
+            await _exportService.ExportToWordAsync(SelectedNote, filePath);
+            StatusMessage = $"Word exporté: {filePath}";
+        }
+        catch (Exception ex)
+        {
+            StatusMessage = $"Erreur export Word: {ex.Message}";
+        }
+    }
+
+    [RelayCommand]
+    private async Task ToggleThemeAsync()
+    {
+        try
+        {
+            var newTheme = await _themeService.ToggleThemeAsync();
+            UpdateThemeDisplay();
+            StatusMessage = $"Thème changé: {CurrentTheme}";
+        }
+        catch (Exception ex)
+        {
+            StatusMessage = $"Erreur changement thème: {ex.Message}";
+        }
+    }
+
+    private void UpdateThemeDisplay()
+    {
+        var theme = _themeService.GetCurrentTheme();
+        CurrentTheme = theme.Key switch
+        {
+            "Dark" => "Sombre",
+            "Light" => "Clair",
+            _ => "Système"
+        };
+    }
+
+    [RelayCommand]
+    private async Task ImproveTextAsync()
+    {
+        if (string.IsNullOrWhiteSpace(EditorContent))
+            return;
+
+        try
+        {
+            StatusMessage = "Amélioration du texte...";
+            var improved = await _aiService.ImproveTextQualityAsync(EditorContent);
+            EditorContent = improved;
+            StatusMessage = "Texte amélioré !";
+        }
+        catch (Exception ex)
+        {
+            StatusMessage = $"Erreur: {ex.Message}";
+        }
+    }
+
+    [RelayCommand]
+    private async Task AnalyzeFormattingAsync()
+    {
+        if (string.IsNullOrWhiteSpace(EditorContent))
+            return;
+
+        try
+        {
+            StatusMessage = "Analyse de la mise en forme...";
+            var suggestions = await _aiService.SuggestFormattingAsync(EditorContent);
+            
+            if (suggestions.Any())
+            {
+                var suggestionText = string.Join("\n", suggestions);
+                StatusMessage = suggestionText;
+            }
+            else
+            {
+                StatusMessage = "✅ Mise en forme correcte !";
+            }
+        }
+        catch (Exception ex)
+        {
+            StatusMessage = $"Erreur: {ex.Message}";
+        }
+    }
+
+    [RelayCommand]
+    private void ApplyBoldFormatting()
+    {
+        // Note: This is a simplified implementation that applies formatting to the last word.
+        // Full text selection support would require integration with the TextBox's SelectionStart/SelectionEnd properties.
+        if (!string.IsNullOrWhiteSpace(EditorContent))
+        {
+            var lines = EditorContent.Split('\n');
+            if (lines.Length > 0)
+            {
+                var lastLine = lines[^1];
+                var words = lastLine.Split(' ');
+                if (words.Length > 0)
+                {
+                    words[^1] = _formattingService.ApplyBold(words[^1]);
+                    lines[^1] = string.Join(' ', words);
+                    EditorContent = string.Join('\n', lines);
+                }
+            }
+        }
+    }
+
+    [RelayCommand]
+    private void ApplyItalicFormatting()
+    {
+        // Note: This is a simplified implementation. See ApplyBoldFormatting comment.
+        if (!string.IsNullOrWhiteSpace(EditorContent))
+        {
+            var lines = EditorContent.Split('\n');
+            if (lines.Length > 0)
+            {
+                var lastLine = lines[^1];
+                var words = lastLine.Split(' ');
+                if (words.Length > 0)
+                {
+                    words[^1] = _formattingService.ApplyItalic(words[^1]);
+                    lines[^1] = string.Join(' ', words);
+                    EditorContent = string.Join('\n', lines);
+                }
+            }
+        }
+    }
+
+    [RelayCommand]
+    private void InsertHeading(string level)
+    {
+        if (int.TryParse(level, out var headingLevel))
+        {
+            var heading = _formattingService.ApplyHeading("Titre", headingLevel);
+            EditorContent += $"\n{heading}\n";
+        }
+    }
+
+    [RelayCommand]
+    private void InsertBulletList()
+    {
+        var list = _formattingService.CreateBulletList(new List<string> { "Item 1", "Item 2", "Item 3" });
+        EditorContent += $"\n{list}\n";
+    }
+
+    [RelayCommand]
+    private void InsertTable()
+    {
+        var headers = new List<string> { "Colonne 1", "Colonne 2", "Colonne 3" };
+        var rows = new List<List<string>>
+        {
+            new() { "Donnée 1", "Donnée 2", "Donnée 3" },
+            new() { "Donnée 4", "Donnée 5", "Donnée 6" }
+        };
+        var table = _formattingService.CreateTable(headers, rows);
+        EditorContent += $"\n{table}\n";
+    }
+
+    [RelayCommand]
+    private void InsertHorizontalRule()
+    {
+        EditorContent += _formattingService.InsertHorizontalRule();
+    }
+
+    [RelayCommand]
+    private void InsertCodeBlock()
+    {
+        var code = _formattingService.CreateCodeBlock("// Votre code ici", "csharp");
+        EditorContent += $"\n{code}\n";
     }
 }
