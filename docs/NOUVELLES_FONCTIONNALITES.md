@@ -257,10 +257,11 @@ Les implications de [Sujet] sont multiples...
 
 ### Lignes de Code
 
-- **+800 lignes** de nouveau code
-- **Services** : 4 nouveaux fichiers (~2000 lignes)
+- **Services** : 4 nouveaux fichiers (~1200 lignes)
 - **ViewModel** : +120 lignes (nouvelles commandes)
 - **UI** : Barre de formatage et menus enrichis
+- **Documentation** : +500 lignes
+- **Total ajouté** : ~1800 lignes de code productif
 
 ---
 

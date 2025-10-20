@@ -13,10 +13,16 @@ public class FormattingService
 {
     /// <summary>
     /// Apply bold formatting to selected text
+    /// Note: Current implementation applies to the last word. 
+    /// Full text selection support requires cursor position tracking.
     /// </summary>
     public string ApplyBold(string text)
     {
         if (string.IsNullOrWhiteSpace(text))
+            return text;
+        
+        // Check if already bold to avoid double-formatting
+        if (text.StartsWith("**") && text.EndsWith("**"))
             return text;
         
         return $"**{text}**";
@@ -24,10 +30,16 @@ public class FormattingService
 
     /// <summary>
     /// Apply italic formatting to selected text
+    /// Note: Current implementation applies to the last word.
+    /// Full text selection support requires cursor position tracking.
     /// </summary>
     public string ApplyItalic(string text)
     {
         if (string.IsNullOrWhiteSpace(text))
+            return text;
+        
+        // Check if already italic to avoid double-formatting
+        if (text.StartsWith("*") && text.EndsWith("*") && !text.StartsWith("**"))
             return text;
         
         return $"*{text}*";
@@ -159,7 +171,7 @@ public class FormattingService
         sb.AppendLine("| " + string.Join(" | ", headers) + " |");
         
         // Separator
-        sb.AppendLine("|" + string.Join("|", headers.Select(_ => "---")) + "|");
+        sb.AppendLine("|" + string.Join("|", headers.Select(header => "---")) + "|");
         
         // Rows
         if (rows != null)

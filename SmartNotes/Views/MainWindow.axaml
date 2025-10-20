@@ -187,9 +187,9 @@
                             <Button Content="📋" ToolTip.Tip="Insérer un tableau" 
                                     Command="{Binding InsertTableCommand}"
                                     FontSize="14" Width="32" Height="32" Padding="6"/>
-                            <Button Content="&lt; &gt;" ToolTip.Tip="Bloc de code" 
+                            <Button Content="Code" ToolTip.Tip="Bloc de code" 
                                     Command="{Binding InsertCodeBlockCommand}"
-                                    FontSize="11" Width="32" Height="32" Padding="6"/>
+                                    FontSize="10" Width="40" Height="32" Padding="6"/>
                             <Button Content="—" ToolTip.Tip="Ligne horizontale" 
                                     Command="{Binding InsertHorizontalRuleCommand}"
                                     FontSize="14" Width="32" Height="32" Padding="6"/>

@@ -402,9 +402,10 @@ public partial class MainWindowViewModel : ViewModelBase
     [RelayCommand]
     private void ApplyBoldFormatting()
     {
+        // Note: This is a simplified implementation that applies formatting to the last word.
+        // Full text selection support would require integration with the TextBox's SelectionStart/SelectionEnd properties.
         if (!string.IsNullOrWhiteSpace(EditorContent))
         {
-            // Apply bold to the last word or selected text (simplified)
             var lines = EditorContent.Split('\n');
             if (lines.Length > 0)
             {
@@ -423,6 +424,7 @@ public partial class MainWindowViewModel : ViewModelBase
     [RelayCommand]
     private void ApplyItalicFormatting()
     {
+        // Note: This is a simplified implementation. See ApplyBoldFormatting comment.
         if (!string.IsNullOrWhiteSpace(EditorContent))
         {
             var lines = EditorContent.Split('\n');

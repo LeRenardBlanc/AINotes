@@ -91,9 +91,9 @@ public class KeyboardShortcutsService
                 }
             }
         }
-        catch
+        catch (Exception)
         {
-            // Use defaults on error
+            // Use defaults on error - silent fallback is intentional for first-time users
             _shortcuts = GetDefaultShortcuts();
         }
 
