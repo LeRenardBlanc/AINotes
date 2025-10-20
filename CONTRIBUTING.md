@@ -434,9 +434,8 @@ Contributors will be:
 
 ## ❓ Questions?
 
-- **GitHub Discussions**: Ask questions
-- **GitHub Issues**: For specific problems
-- **Email**: support@smartnotes.app (future)
+- **GitHub Discussions**: Ask questions and share ideas
+- **GitHub Issues**: For bug reports and feature requests
 
 ## 📜 Code of Conduct
 

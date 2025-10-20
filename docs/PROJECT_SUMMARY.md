@@ -440,10 +440,10 @@ Borders:        System theme
 
 ### Development Effort
 
-- **Start Date**: October 2025
+- **Start Date**: October 2024
 - **Current Version**: 1.0.0
 - **Development Time**: ~2 days (intensive)
-- **Commits**: 3
+- **Commits**: 4
 - **Contributors**: 1 (open for more!)
 
 ### Repository Stats
@@ -529,4 +529,4 @@ SmartNotes represents a complete, production-ready note-taking application with 
 
 *Built with ❤️ using .NET and Avalonia UI*
 
-*Last Updated: October 2025*
+*Last Updated: October 2024*
