@@ -1,0 +1,275 @@
+<Window xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:vm="using:SmartNotes.ViewModels"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        mc:Ignorable="d" d:DesignWidth="1400" d:DesignHeight="850"
+        x:Class="SmartNotes.Views.MainWindow"
+        x:DataType="vm:MainWindowViewModel"
+        Icon="/Assets/avalonia-logo.ico"
+        Title="SmartNotes - Votre Compagnon d'Écriture Intelligent"
+        Width="1400" Height="850"
+        MinWidth="1000" MinHeight="600"
+        Background="{DynamicResource SystemChromeLowColor}">
+
+    <Design.DataContext>
+        <vm:MainWindowViewModel/>
+    </Design.DataContext>
+
+    <Grid RowDefinitions="Auto,*,Auto">
+        <!-- Top Menu Bar -->
+        <Border Grid.Row="0" Background="{DynamicResource SystemAccentColor}" Padding="16,12">
+            <Grid ColumnDefinitions="Auto,*,Auto">
+                <StackPanel Grid.Column="0" Orientation="Horizontal" Spacing="12">
+                    <TextBlock Text="📝 SmartNotes" FontSize="20" FontWeight="Bold" 
+                               Foreground="White" VerticalAlignment="Center"/>
+                    <Button Content="+ Nouvelle Note" 
+                            Command="{Binding CreateNewNoteCommand}"
+                            Background="#0066CC" Foreground="White"
+                            Padding="16,8" CornerRadius="6"
+                            FontWeight="SemiBold"/>
+                </StackPanel>
+                
+                <TextBox Grid.Column="1" 
+                         Text="{Binding SearchQuery}"
+                         Watermark="🔍 Rechercher dans vos notes..."
+                         MinWidth="300" MaxWidth="500"
+                         Margin="20,0"
+                         Padding="12,8"
+                         VerticalAlignment="Center"
+                         HorizontalAlignment="Center"
+                         CornerRadius="6">
+                    <TextBox.KeyBindings>
+                        <KeyBinding Gesture="Enter" Command="{Binding SearchNotesCommand}" />
+                    </TextBox.KeyBindings>
+                </TextBox>
+                
+                <StackPanel Grid.Column="2" Orientation="Horizontal" Spacing="8">
+                    <Button Content="⚙️" ToolTip.Tip="Paramètres" 
+                            Background="Transparent" Foreground="White"
+                            Padding="12,8" FontSize="16"/>
+                </StackPanel>
+            </Grid>
+        </Border>
+
+        <!-- Main Content Area -->
+        <Grid Grid.Row="1" ColumnDefinitions="280,*">
+            <!-- Left Sidebar - Notes List -->
+            <Border Grid.Column="0" Background="{DynamicResource SystemChromeMediumLowColor}"
+                    BorderBrush="{DynamicResource SystemControlForegroundBaseMediumLowBrush}"
+                    BorderThickness="0,0,1,0">
+                <Grid RowDefinitions="Auto,*,Auto">
+                    <!-- Categories -->
+                    <StackPanel Grid.Row="0" Margin="16,16,16,8">
+                        <TextBlock Text="CATÉGORIES" FontSize="11" FontWeight="Bold" 
+                                   Opacity="0.6" Margin="0,0,0,8"/>
+                        <ItemsControl ItemsSource="{Binding Categories}">
+                            <ItemsControl.ItemTemplate>
+                                <DataTemplate>
+                                    <Button Margin="0,2" Padding="8,6" 
+                                            HorizontalAlignment="Stretch"
+                                            HorizontalContentAlignment="Left"
+                                            Background="Transparent">
+                                        <StackPanel Orientation="Horizontal" Spacing="8">
+                                            <TextBlock Text="{Binding Icon}" FontSize="16"/>
+                                            <TextBlock Text="{Binding Name}" VerticalAlignment="Center"/>
+                                        </StackPanel>
+                                    </Button>
+                                </DataTemplate>
+                            </ItemsControl.ItemTemplate>
+                        </ItemsControl>
+                    </StackPanel>
+
+                    <!-- Notes List -->
+                    <ScrollViewer Grid.Row="1">
+                        <StackPanel Margin="16,8">
+                            <TextBlock Text="MES NOTES" FontSize="11" FontWeight="Bold" 
+                                       Opacity="0.6" Margin="0,0,0,8"/>
+                            <ItemsControl ItemsSource="{Binding Notes}">
+                                <ItemsControl.ItemTemplate>
+                                    <DataTemplate>
+                                        <Button Margin="0,4" Padding="12,10"
+                                                HorizontalAlignment="Stretch"
+                                                HorizontalContentAlignment="Stretch"
+                                                Background="{DynamicResource SystemChromeMediumColor}"
+                                                CornerRadius="6"
+                                                Command="{Binding $parent[Window].((vm:MainWindowViewModel)DataContext).SelectNoteCommand}"
+                                                CommandParameter="{Binding}">
+                                            <Grid RowDefinitions="Auto,Auto,Auto">
+                                                <Grid Grid.Row="0" ColumnDefinitions="*,Auto">
+                                                    <TextBlock Grid.Column="0" Text="{Binding Title}" 
+                                                               FontWeight="SemiBold" FontSize="13"
+                                                               TextTrimming="CharacterEllipsis"
+                                                               MaxLines="1"/>
+                                                    <TextBlock Grid.Column="1" 
+                                                               Text="{Binding IsFavorite, Converter={StaticResource BoolToStarConverter}}"
+                                                               FontSize="14" 
+                                                               IsVisible="{Binding IsFavorite}"/>
+                                                </Grid>
+                                                <TextBlock Grid.Row="1" 
+                                                           Text="{Binding Content}" 
+                                                           Opacity="0.7" FontSize="11"
+                                                           TextTrimming="CharacterEllipsis"
+                                                           MaxLines="2"
+                                                           Margin="0,4,0,0"/>
+                                                <TextBlock Grid.Row="2"
+                                                           Text="{Binding ModifiedAt, StringFormat='Modifié: {0:dd/MM/yyyy HH:mm}'}"
+                                                           Opacity="0.5" FontSize="10"
+                                                           Margin="0,4,0,0"/>
+                                            </Grid>
+                                        </Button>
+                                    </DataTemplate>
+                                </ItemsControl.ItemTemplate>
+                            </ItemsControl>
+                        </StackPanel>
+                    </ScrollViewer>
+
+                    <!-- Stats -->
+                    <Border Grid.Row="2" Background="{DynamicResource SystemChromeLowColor}"
+                            Padding="16,12" BorderBrush="{DynamicResource SystemControlForegroundBaseMediumLowBrush}"
+                            BorderThickness="0,1,0,0">
+                        <StackPanel Spacing="4">
+                            <TextBlock FontSize="11" Opacity="0.7">
+                                <Run Text="📊 Total:"/>
+                                <Run Text="{Binding Notes.Count}" FontWeight="Bold"/>
+                                <Run Text="notes"/>
+                            </TextBlock>
+                        </StackPanel>
+                    </Border>
+                </Grid>
+            </Border>
+
+            <!-- Right Side - Editor -->
+            <Grid Grid.Column="1" RowDefinitions="Auto,*,Auto" IsVisible="{Binding IsEditing}">
+                <!-- Editor Toolbar -->
+                <Border Grid.Row="0" Background="{DynamicResource SystemChromeMediumLowColor}"
+                        Padding="20,16" BorderBrush="{DynamicResource SystemControlForegroundBaseMediumLowBrush}"
+                        BorderThickness="0,0,0,1">
+                    <Grid RowDefinitions="Auto,Auto">
+                        <!-- Title -->
+                        <TextBox Grid.Row="0" 
+                                 Text="{Binding NoteTitle}"
+                                 FontSize="24" FontWeight="Bold"
+                                 BorderThickness="0"
+                                 Background="Transparent"
+                                 Watermark="Titre de la note..."
+                                 Margin="0,0,0,12"/>
+                        
+                        <!-- Action Buttons -->
+                        <StackPanel Grid.Row="1" Orientation="Horizontal" Spacing="8">
+                            <Button Content="💾 Sauvegarder" 
+                                    Command="{Binding SaveCurrentNoteCommand}"
+                                    Background="#107C10" Foreground="White"
+                                    Padding="12,6" CornerRadius="4"/>
+                            <Button Content="⭐ Favori" 
+                                    Command="{Binding ToggleFavoriteCommand}"
+                                    CommandParameter="{Binding SelectedNote}"
+                                    Padding="12,6" CornerRadius="4"/>
+                            <Separator Width="1" Height="24"/>
+                            <Button Content="🤖 Générer Contenu" 
+                                    Command="{Binding GenerateAIContentCommand}"
+                                    CommandParameter="intelligence artificielle"
+                                    Background="#8764B8" Foreground="White"
+                                    Padding="12,6" CornerRadius="4"/>
+                            <Button Content="📝 Résumé" 
+                                    Command="{Binding SummarizeNoteCommand}"
+                                    Padding="12,6" CornerRadius="4"/>
+                            <Button Content="🎓 Fiches" 
+                                    Command="{Binding GenerateFlashcardsCommand}"
+                                    Padding="12,6" CornerRadius="4"/>
+                            <Separator Width="1" Height="24"/>
+                            <Button Content="🗑️ Supprimer" 
+                                    Command="{Binding DeleteNoteCommand}"
+                                    CommandParameter="{Binding SelectedNote}"
+                                    Background="#D13438" Foreground="White"
+                                    Padding="12,6" CornerRadius="4"/>
+                        </StackPanel>
+                    </Grid>
+                </Border>
+
+                <!-- Editor Content -->
+                <Border Grid.Row="1" Padding="20" Background="{DynamicResource SystemChromeLowColor}">
+                    <ScrollViewer VerticalScrollBarVisibility="Auto">
+                        <TextBox Text="{Binding EditorContent}"
+                                 AcceptsReturn="True"
+                                 TextWrapping="Wrap"
+                                 BorderThickness="0"
+                                 Background="Transparent"
+                                 FontSize="14"
+                                 LineHeight="24"
+                                 Watermark="Commencez à écrire... L'IA vous assistera automatiquement ! ✨"
+                                 MinHeight="400"/>
+                    </ScrollViewer>
+                </Border>
+
+                <!-- Word Count & Status -->
+                <Border Grid.Row="2" Background="{DynamicResource SystemChromeMediumLowColor}"
+                        Padding="20,12" BorderBrush="{DynamicResource SystemControlForegroundBaseMediumLowBrush}"
+                        BorderThickness="0,1,0,0">
+                    <Grid ColumnDefinitions="*,Auto">
+                        <TextBlock Grid.Column="0" 
+                                   Text="{Binding StatusMessage}"
+                                   VerticalAlignment="Center"
+                                   FontSize="12" Opacity="0.7"/>
+                        <StackPanel Grid.Column="1" Orientation="Horizontal" Spacing="16">
+                            <TextBlock VerticalAlignment="Center" FontSize="12" Opacity="0.7">
+                                <Run Text="Mots:"/>
+                                <Run Text="{Binding SelectedNote.WordCount}" FontWeight="Bold"/>
+                            </TextBlock>
+                            <TextBlock Text="🤖 IA Activée" 
+                                       VerticalAlignment="Center"
+                                       FontSize="12" 
+                                       Foreground="#107C10"
+                                       FontWeight="SemiBold"/>
+                        </StackPanel>
+                    </Grid>
+                </Border>
+            </Grid>
+
+            <!-- Welcome Screen when no note selected -->
+            <Grid Grid.Column="1" IsVisible="{Binding !IsEditing}">
+                <StackPanel VerticalAlignment="Center" HorizontalAlignment="Center" 
+                            Spacing="24" MaxWidth="500">
+                    <TextBlock Text="✨" FontSize="72" HorizontalAlignment="Center"/>
+                    <TextBlock Text="Bienvenue dans SmartNotes" 
+                               FontSize="32" FontWeight="Bold"
+                               HorizontalAlignment="Center"/>
+                    <TextBlock Text="Votre compagnon d'écriture intelligent avec IA intégrée" 
+                               FontSize="16" Opacity="0.7"
+                               TextAlignment="Center"
+                               TextWrapping="Wrap"/>
+                    <Button Content="➕ Créer votre première note" 
+                            Command="{Binding CreateNewNoteCommand}"
+                            HorizontalAlignment="Center"
+                            Background="{DynamicResource SystemAccentColor}"
+                            Foreground="White"
+                            Padding="24,12"
+                            FontSize="16"
+                            CornerRadius="8"/>
+                    <StackPanel Spacing="8" Opacity="0.6" Margin="0,20,0,0">
+                        <TextBlock Text="💡 Astuce: Utilisez Ctrl+N pour créer une nouvelle note" 
+                                   FontSize="12" TextAlignment="Center"/>
+                        <TextBlock Text="✨ L'IA vous aidera à écrire plus vite et mieux" 
+                                   FontSize="12" TextAlignment="Center"/>
+                    </StackPanel>
+                </StackPanel>
+            </Grid>
+        </Grid>
+
+        <!-- Bottom Status Bar -->
+        <Border Grid.Row="2" Background="{DynamicResource SystemChromeMediumColor}"
+                Padding="16,8" BorderBrush="{DynamicResource SystemControlForegroundBaseMediumLowBrush}"
+                BorderThickness="0,1,0,0">
+            <Grid ColumnDefinitions="*,Auto">
+                <TextBlock Grid.Column="0" 
+                           Text="SmartNotes v1.0 - Application locale avec IA 🧠" 
+                           FontSize="11" Opacity="0.7"
+                           VerticalAlignment="Center"/>
+                <TextBlock Grid.Column="1" 
+                           Text="{Binding StatusMessage}"
+                           FontSize="11" Opacity="0.7"
+                           VerticalAlignment="Center"/>
+            </Grid>
+        </Border>
+    </Grid>
+</Window>
