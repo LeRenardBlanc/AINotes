@@ -19,6 +19,14 @@
 - **Organisation intuitive** : Catégories, tags, couleurs personnalisables
 - **Recherche instantanée** : Trouvez n'importe quelle note en quelques touches
 - **Favoris** : Épinglez vos notes importantes pour un accès rapide
+- **🌙 Mode sombre/clair** : Basculez entre les thèmes selon vos préférences
+
+### 📥 **Export Multi-Format**
+
+- **Export PDF** : Génération de documents PDF professionnels avec mise en page
+- **Export Markdown** : Format universel compatible avec tous les éditeurs
+- **Export Word (DOCX)** : Documents Microsoft Word avec formatage
+- **Export Texte** : Format texte brut pour une compatibilité maximale
 
 ### 🤖 **Assistant IA en Temps Réel**
 
@@ -31,11 +39,13 @@
 - **Développement d'idées** : Donnez un mot-clé, l'IA développe un paragraphe complet
 - **Explications automatiques** : Demandez sur un sujet → texte détaillé généré
 - **Reformulation** : Réécrivez un passage dans un style différent
+- **Amélioration de texte** : L'IA améliore la qualité et le style de votre écriture
 
 #### **Aide à la Révision**
 - **Résumés automatiques** : Créez un résumé de vos notes en un clic
 - **Fiches d'étude** : L'IA extrait les points clés et génère des questions
 - **Organisation intelligente** : Classement automatique par catégories
+- **Analyse de mise en forme** : Détection des améliorations possibles dans la structure du texte
 
 ---
 
@@ -70,6 +80,9 @@ Le projet utilise les packages NuGet suivants :
 - **CommunityToolkit.Mvvm** (8.2.1) - Architecture MVVM
 - **Microsoft.ML.OnnxRuntime** (1.23.1) - Runtime IA local
 - **Newtonsoft.Json** (13.0.4) - Sérialisation JSON
+- **QuestPDF** (2024.10.3) - Génération de documents PDF
+- **Markdig** (0.37.0) - Traitement Markdown
+- **DocumentFormat.OpenXml** (3.1.0) - Génération de documents Word
 
 ---
 
@@ -81,9 +94,25 @@ Le projet utilise les packages NuGet suivants :
 3. Commencez à écrire dans l'éditeur
 
 ### Utiliser l'Assistant IA
-- **🤖 Générer Contenu** : Génère automatiquement du contenu basé sur un sujet
-- **📝 Résumé** : Crée un résumé de votre note actuelle
-- **🎓 Fiches** : Génère des fiches de révision avec questions/réponses
+- **🤖 IA** : Menu déroulant avec toutes les fonctionnalités IA
+  - **Générer Contenu** : Génère automatiquement du contenu basé sur un sujet
+  - **Résumé** : Crée un résumé de votre note actuelle
+  - **Fiches de révision** : Génère des fiches avec questions/réponses
+  - **Améliorer le texte** : Améliore la qualité et le style de votre texte
+  - **Analyser la mise en forme** : Suggestions d'amélioration de structure
+
+### Exporter vos notes
+- Cliquez sur **📥 Exporter** dans la barre d'outils
+- Choisissez le format :
+  - **PDF** : Document professionnel avec mise en page
+  - **Markdown** : Format universel pour développeurs et écrivains
+  - **Word (DOCX)** : Compatible avec Microsoft Word et LibreOffice
+- Les fichiers sont sauvegardés dans `Documents/SmartNotes/Exports`
+
+### Changer de thème
+- Cliquez sur l'icône **🌙** en haut à droite
+- Basculez entre mode clair et mode sombre
+- Le thème est sauvegardé automatiquement
 
 ### Organiser vos notes
 - Utilisez les **catégories** pour classer vos notes
@@ -173,17 +202,18 @@ Les notes sont stockées au format JSON dans le dossier de données local :
 
 ## 🚧 Fonctionnalités à venir
 
-- [ ] Export en PDF, Markdown et Word
+- [x] Export en PDF, Markdown et Word ✅ **IMPLÉMENTÉ**
+- [x] Mode sombre/clair ✅ **IMPLÉMENTÉ**
+- [x] Amélioration de l'IA avec suggestions avancées ✅ **IMPLÉMENTÉ**
 - [ ] Support des images et tableaux dans l'éditeur
 - [ ] Mode "tableau blanc" avec drag & drop
 - [ ] Synchronisation cloud optionnelle
 - [ ] Thèmes de couleurs personnalisés
-- [ ] Mode sombre/clair
 - [ ] Raccourcis clavier personnalisables
 - [ ] Import de documents PDF/Word
 - [ ] Notes vocales avec transcription
 - [ ] Graphe de connaissances
-- [ ] Amélioration de l'IA avec modèles locaux plus avancés
+- [ ] Formatage riche avancé (gras, italique, couleurs, tailles de police)
 
 ---
 

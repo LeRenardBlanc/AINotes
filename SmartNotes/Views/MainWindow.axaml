@@ -45,6 +45,10 @@
                 </TextBox>
                 
                 <StackPanel Grid.Column="2" Orientation="Horizontal" Spacing="8">
+                    <Button Content="🌙" ToolTip.Tip="Changer le thème" 
+                            Command="{Binding ToggleThemeCommand}"
+                            Background="Transparent" Foreground="White"
+                            Padding="12,8" FontSize="16"/>
                     <Button Content="⚙️" ToolTip.Tip="Paramètres" 
                             Background="Transparent" Foreground="White"
                             Padding="12,8" FontSize="16"/>
@@ -166,17 +170,33 @@
                                     CommandParameter="{Binding SelectedNote}"
                                     Padding="12,6" CornerRadius="4"/>
                             <Separator Width="1" Height="24"/>
-                            <Button Content="🤖 Générer Contenu" 
-                                    Command="{Binding GenerateAIContentCommand}"
-                                    CommandParameter="intelligence artificielle"
+                            <!-- Export Menu -->
+                            <Button Content="📥 Exporter" 
+                                    Padding="12,6" CornerRadius="4">
+                                <Button.Flyout>
+                                    <MenuFlyout>
+                                        <MenuItem Header="📄 PDF" Command="{Binding ExportNotePdfCommand}"/>
+                                        <MenuItem Header="📝 Markdown" Command="{Binding ExportNoteMarkdownCommand}"/>
+                                        <MenuItem Header="📘 Word (DOCX)" Command="{Binding ExportNoteWordCommand}"/>
+                                    </MenuFlyout>
+                                </Button.Flyout>
+                            </Button>
+                            <Separator Width="1" Height="24"/>
+                            <!-- AI Features -->
+                            <Button Content="🤖 IA" 
                                     Background="#8764B8" Foreground="White"
-                                    Padding="12,6" CornerRadius="4"/>
-                            <Button Content="📝 Résumé" 
-                                    Command="{Binding SummarizeNoteCommand}"
-                                    Padding="12,6" CornerRadius="4"/>
-                            <Button Content="🎓 Fiches" 
-                                    Command="{Binding GenerateFlashcardsCommand}"
-                                    Padding="12,6" CornerRadius="4"/>
+                                    Padding="12,6" CornerRadius="4">
+                                <Button.Flyout>
+                                    <MenuFlyout>
+                                        <MenuItem Header="🤖 Générer Contenu" Command="{Binding GenerateAIContentCommand}" CommandParameter="intelligence artificielle"/>
+                                        <MenuItem Header="📝 Résumé" Command="{Binding SummarizeNoteCommand}"/>
+                                        <MenuItem Header="🎓 Fiches de révision" Command="{Binding GenerateFlashcardsCommand}"/>
+                                        <Separator/>
+                                        <MenuItem Header="✨ Améliorer le texte" Command="{Binding ImproveTextCommand}"/>
+                                        <MenuItem Header="📋 Analyser la mise en forme" Command="{Binding AnalyzeFormattingCommand}"/>
+                                    </MenuFlyout>
+                                </Button.Flyout>
+                            </Button>
                             <Separator Width="1" Height="24"/>
                             <Button Content="🗑️ Supprimer" 
                                     Command="{Binding DeleteNoteCommand}"

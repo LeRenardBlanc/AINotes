@@ -13,6 +13,8 @@ public partial class MainWindowViewModel : ViewModelBase
 {
     private readonly NotesService _notesService;
     private readonly AIService _aiService;
+    private readonly ExportService _exportService;
+    private readonly ThemeService _themeService;
 
     [ObservableProperty]
     private ObservableCollection<Note> _notes = new();
@@ -41,16 +43,23 @@ public partial class MainWindowViewModel : ViewModelBase
     [ObservableProperty]
     private string _statusMessage = "Prêt";
 
+    [ObservableProperty]
+    private string _currentTheme = "Clair";
+
     public MainWindowViewModel()
     {
         _notesService = new NotesService();
         _aiService = new AIService();
+        _exportService = new ExportService();
+        _themeService = new ThemeService();
         
         _ = InitializeAsync();
     }
 
     private async Task InitializeAsync()
     {
+        await _themeService.InitializeThemeAsync();
+        UpdateThemeDisplay();
         await LoadNotesAsync();
         await LoadCategoriesAsync();
     }
@@ -253,6 +262,135 @@ public partial class MainWindowViewModel : ViewModelBase
                 await Task.Delay(2000); // Simple debounce
                 await SaveCurrentNoteAsync();
             });
+        }
+    }
+
+    [RelayCommand]
+    private async Task ExportNotePdfAsync()
+    {
+        if (SelectedNote == null)
+            return;
+
+        try
+        {
+            StatusMessage = "Export PDF en cours...";
+            var filePath = _exportService.GetSuggestedFilePath(SelectedNote, "pdf");
+            await _exportService.ExportToPdfAsync(SelectedNote, filePath);
+            StatusMessage = $"PDF exporté: {filePath}";
+        }
+        catch (Exception ex)
+        {
+            StatusMessage = $"Erreur export PDF: {ex.Message}";
+        }
+    }
+
+    [RelayCommand]
+    private async Task ExportNoteMarkdownAsync()
+    {
+        if (SelectedNote == null)
+            return;
+
+        try
+        {
+            StatusMessage = "Export Markdown en cours...";
+            var filePath = _exportService.GetSuggestedFilePath(SelectedNote, "md");
+            await _exportService.ExportToMarkdownAsync(SelectedNote, filePath);
+            StatusMessage = $"Markdown exporté: {filePath}";
+        }
+        catch (Exception ex)
+        {
+            StatusMessage = $"Erreur export Markdown: {ex.Message}";
+        }
+    }
+
+    [RelayCommand]
+    private async Task ExportNoteWordAsync()
+    {
+        if (SelectedNote == null)
+            return;
+
+        try
+        {
+            StatusMessage = "Export Word en cours...";
+            var filePath = _exportService.GetSuggestedFilePath(SelectedNote, "docx");
+            await _exportService.ExportToWordAsync(SelectedNote, filePath);
+            StatusMessage = $"Word exporté: {filePath}";
+        }
+        catch (Exception ex)
+        {
+            StatusMessage = $"Erreur export Word: {ex.Message}";
+        }
+    }
+
+    [RelayCommand]
+    private async Task ToggleThemeAsync()
+    {
+        try
+        {
+            var newTheme = await _themeService.ToggleThemeAsync();
+            UpdateThemeDisplay();
+            StatusMessage = $"Thème changé: {CurrentTheme}";
+        }
+        catch (Exception ex)
+        {
+            StatusMessage = $"Erreur changement thème: {ex.Message}";
+        }
+    }
+
+    private void UpdateThemeDisplay()
+    {
+        var theme = _themeService.GetCurrentTheme();
+        CurrentTheme = theme.Key switch
+        {
+            "Dark" => "Sombre",
+            "Light" => "Clair",
+            _ => "Système"
+        };
+    }
+
+    [RelayCommand]
+    private async Task ImproveTextAsync()
+    {
+        if (string.IsNullOrWhiteSpace(EditorContent))
+            return;
+
+        try
+        {
+            StatusMessage = "Amélioration du texte...";
+            var improved = await _aiService.ImproveTextQualityAsync(EditorContent);
+            EditorContent = improved;
+            StatusMessage = "Texte amélioré !";
+        }
+        catch (Exception ex)
+        {
+            StatusMessage = $"Erreur: {ex.Message}";
+        }
+    }
+
+    [RelayCommand]
+    private async Task AnalyzeFormattingAsync()
+    {
+        if (string.IsNullOrWhiteSpace(EditorContent))
+            return;
+
+        try
+        {
+            StatusMessage = "Analyse de la mise en forme...";
+            var suggestions = await _aiService.SuggestFormattingAsync(EditorContent);
+            
+            if (suggestions.Any())
+            {
+                var suggestionText = string.Join("\n", suggestions);
+                StatusMessage = suggestionText;
+            }
+            else
+            {
+                StatusMessage = "✅ Mise en forme correcte !";
+            }
+        }
+        catch (Exception ex)
+        {
+            StatusMessage = $"Erreur: {ex.Message}";
         }
     }
 }
